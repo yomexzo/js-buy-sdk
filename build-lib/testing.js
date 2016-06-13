@@ -39,6 +39,9 @@ function testsTree(pathConfig) {
   const qunitShim = funnel(pathConfig.shims, { include: ['qunit.js'] });
   const qunitShimAmd = babelTranspiler(qunitShim, babelConfig(null, 'amd'));
   const qunitShimCommon = babelTranspiler(qunitShim, babelConfig(null, 'commonjs'));
+  const promiseShim = funnel(pathConfig.shims, { include: ['promise.js'] });
+  const promiseShimCommon = babelTranspiler(promiseShim, babelConfig(null, 'commonjs'));
+
 
   const testJs = funnel(pathConfig.tests, {
     include: ['**/*.js']
@@ -59,7 +62,7 @@ function testsTree(pathConfig) {
     outputFile: 'tests.js'
   });
 
-  const nodeLibTestOutput = funnel(mergeTrees([qunitShimCommon, testsCommon]), {
+  const nodeLibTestOutput = funnel(mergeTrees([qunitShimCommon, promiseShimCommon, testsCommon]), {
     srcDir: '.',
     destDir: './node-lib/tests'
   });
