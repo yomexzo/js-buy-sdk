@@ -3,6 +3,7 @@ import ProductOptionModel from './product-option-model';
 import ProductVariantModel from './product-variant-model';
 import uniq from '../metal/uniq';
 
+const NO_IMAGE_URI = 'https://widgets.shopifyapps.com/assets/no-image.svg';
 
 /**
    * Class for products returned by fetch('product')
@@ -122,7 +123,7 @@ const ProductModel = BaseModel.extend({
 
     return this.variants.filter(variant => {
       return variant.title === variantTitle;
-    })[0];
+    })[0] || null;
   },
 
   /**
@@ -131,8 +132,13 @@ const ProductModel = BaseModel.extend({
     * @type {Object}
   */
   get selectedVariantImage() {
+    if (!this.selectedVariant) {
+      return null;
+    }
+
     return this.selectedVariant.image;
   }
 });
 
 export default ProductModel;
+export { NO_IMAGE_URI };

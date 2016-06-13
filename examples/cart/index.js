@@ -146,7 +146,9 @@ $(function() {
   /* Update product image based on selected variant
   ============================================================ */
   function updateVariantImage(image) {
-    $('#buy-button-1 .variant-image').attr('src', image.src);
+    var src = (image) ? image.src : ShopifyBuy.NO_IMAGE_URI;
+
+    $('#buy-button-1 .variant-image').attr('src', src);
   }
 
   /* Update product variant title based on selected variant
@@ -376,11 +378,8 @@ $(function() {
   /* Update cart tab button
   ============================================================ */
   function updateCartTabButton() {
-    if (cart.lineItems.length) {
-      var totalItems = cart.lineItems.reduce(function(total, item) {
-        return total + item.quantity;
-      }, 0);
-      $('.btn--cart-tab .btn__counter').html(totalItems);
+    if (cart.lineItems.length > 0) {
+      $('.btn--cart-tab .btn__counter').html(cart.lineItemCount);
       $('.btn--cart-tab').addClass('js-active');
     } else {
       $('.btn--cart-tab').removeClass('js-active');

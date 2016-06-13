@@ -28,10 +28,10 @@ function sourceTree(pathConfig, moduleType) {
 module.exports = function (pathConfig, env) {
   let tree;
 
-  const amdTree = sourceTree(pathConfig, 'amdStrict');
+  const amdTree = sourceTree(pathConfig, 'amd');
   const polyfillTree = polyfills(env);
   const loaderTree = loader();
-  const commonTree = sourceTree(pathConfig, 'common');
+  const commonTree = sourceTree(pathConfig, 'commonjs');
   const nodeLibOutput = funnel(commonTree, {
     srcDir: '.',
     destDir: './node-lib/src'
