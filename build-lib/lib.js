@@ -5,22 +5,55 @@
 const funnel = require('broccoli-funnel');
 const concat = require('broccoli-concat');
 const mergeTrees = require('broccoli-merge-trees');
+const rollup = require('broccoli-rollup');
+const rollupCommonJS = require('rollup-plugin-commonjs');
+const rollupNodeResolve = require('rollup-plugin-node-resolve');
 const babelTranspiler = require('broccoli-babel-transpiler');
 const uglifyJavaScript = require('broccoli-uglify-js');
 const pkg = require('../package.json');
 const polyfills = require('./polyfills');
 const loader = require('./loader');
-const babelConfig = require('./util/babel-config');
 const Licenser = require('./util/licenser');
 const Versioner = require('./util/versioner');
 
+// this could be replaced in the future by a .babelrc file
+const BABEL_OPTS = {
+  presets: [
+    'es2015'
+  ]
+};
 
-function sourceTree(pathConfig, moduleType) {
-  return babelTranspiler(pathConfig.lib, babelConfig(pkg.name, moduleType));
+function sourceTree(input, output, moduleType) {
+  const rollupTree = rollup(
+    input,
+    {
+      inputFiles: ['**/*.js'],
+      rollup: {
+        entry: 'shopify.js',
+        dest: output,
+        format: moduleType,
+        moduleName: 'Shopify',
+        moduleId: pkg.name,
+        plugins: [
+          rollupNodeResolve({
+            jsnext: true,
+            main: true,
+            browser: true
+          }),
+
+          rollupCommonJS({
+            include: '*'
+          })
+        ]
+      }
+    }
+  );
+
+  return babelTranspiler(rollupTree, BABEL_OPTS);
 }
 
 module.exports = function (pathConfig, env) {
-  const polyfillTree = polyfills(env);
+  const polyfillTree = polyfills();
   const loaderTree = loader();
 
   const trees = [{
@@ -30,7 +63,7 @@ module.exports = function (pathConfig, env) {
     concatOptions: {}
   }, {
     name: 'commonjs',
-    moduleType: 'commonjs',
+    moduleType: 'cjs',
     additionalTrees: [],
     concatOptions: {}
   }, {
@@ -46,23 +79,24 @@ module.exports = function (pathConfig, env) {
       `
     }
   }].map(config => {
-    const baseTree = sourceTree(pathConfig, config.moduleType);
+    const fileOutput = `${pkg.name}.${config.name}.js`;
+    const baseTree = sourceTree(pathConfig.lib, fileOutput, config.moduleType);
 
     const bareTree = concat(mergeTrees([baseTree].concat(config.additionalTrees)), Object.assign({
       inputFiles: ['**/*.js'],
-      outputFile: `${pkg.name}.${config.name}.js`,
+      outputFile: fileOutput
     }, config.concatOptions));
 
     const polyfilledLibTree = concat(mergeTrees([polyfillTree, bareTree]), {
       headerFiles: ['polyfills.js'],
       inputFiles: ['**/*.js'],
-      outputFile: `${pkg.name}.polyfilled.${config.name}.js`,
+      outputFile: `${pkg.name}.polyfilled.${config.name}.js`
     });
 
     return mergeTrees([bareTree, polyfilledLibTree]);
   });
 
-  const nodeTree = funnel(sourceTree(pathConfig, 'commonjs'), {
+  const nodeTree = funnel(babelTranspiler(pathConfig.lib, BABEL_OPTS), {
     srcDir: '.',
     destDir: './node-lib'
   });

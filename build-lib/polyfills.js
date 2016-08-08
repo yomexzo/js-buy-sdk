@@ -5,7 +5,7 @@ const mergeTrees = require('broccoli-merge-trees');
 const treeFromPackage = require('./util/tree-from-package');
 
 
-module.exports = function (/* env */) {
+module.exports = function () {
   const fetchPolyfill = treeFromPackage('whatwg-fetch', ['fetch.js']);
   const rsvp = treeFromPackage('rsvp', ['rsvp.js']);
   const base64Polyfill = treeFromPackage('Base64', ['base64.js']);
