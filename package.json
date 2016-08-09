@@ -57,7 +57,7 @@
     "nodegit": "0.13.0",
     "pretender": "0.10.1",
     "qunitjs": "1.20.0",
-    "rollup-plugin-babel": "^2.6.1",
+    "rollup": "^0.34.7",
     "rollup-plugin-commonjs": "^3.3.1",
     "rollup-plugin-node-resolve": "^2.0.0",
     "rollup-plugin-uglify": "^1.0.1",

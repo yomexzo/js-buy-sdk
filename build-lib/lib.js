@@ -19,7 +19,7 @@ const Versioner = require('./util/versioner');
 // this could be replaced in the future by a .babelrc file
 const BABEL_OPTS = {
   presets: [
-    'es2015'
+    ['es2015']
   ]
 };
 
@@ -32,7 +32,7 @@ function sourceTree(input, output, moduleType) {
         entry: 'shopify.js',
         dest: output,
         format: moduleType,
-        moduleName: 'Shopify',
+        moduleName: 'ShopifyBuy',
         moduleId: pkg.name,
         plugins: [
           rollupNodeResolve({
@@ -57,6 +57,11 @@ module.exports = function (pathConfig, env) {
   const loaderTree = loader();
 
   const trees = [{
+    name: 'umd',
+    moduleType: 'umd',
+    additionalTrees: [],
+    concatOptions: {}
+  }, {
     name: 'amd',
     moduleType: 'amd',
     additionalTrees: [],
