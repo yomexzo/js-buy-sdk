@@ -7,7 +7,6 @@
   "scripts": {
     "build": "node ./scripts/build",
     "prepublish": "node ./scripts/prepublish",
-    "rollup": "rm -rf lib/; rollup -c",
     "doc-server": "yuidoc --server 5000",
     "start": "broccoli serve",
     "examples": "env EXAMPLES=1 broccoli serve",
